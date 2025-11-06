@@ -33,4 +33,14 @@ class FakeStockRepository implements StockRepository {
     final ticker = _dataSource.requireTicker(symbol);
     return ticker.seriesFor(interval);
   }
+
+  @override
+  Future<void> addToWatchlist(String symbol) async {
+    _dataSource.addToWatchlist(symbol);
+  }
+
+  @override
+  Future<void> removeFromWatchlist(String symbol) async {
+    _dataSource.removeFromWatchlist(symbol);
+  }
 }

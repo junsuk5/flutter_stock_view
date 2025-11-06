@@ -5,14 +5,27 @@ import '../../domain/models/stock_interval.dart';
 import '../../domain/models/stock_ticker.dart';
 
 class FakeStockDataSource {
-  FakeStockDataSource() : _tickers = _buildTickers();
+  FakeStockDataSource() : 
+    _tickers = _buildTickers(),
+    _watchlist = _defaultWatchlist.toList();
 
   final Map<String, StockTicker> _tickers;
+  final List<String> _watchlist;
 
-  static const List<String> defaultWatchlist = ['AAPL', 'TSLA', 'MSFT'];
+  static final List<String> _defaultWatchlist = ['AAPL', 'TSLA', 'MSFT'];
 
   List<StockTicker> get watchlistTickers =>
-      defaultWatchlist.map(requireTicker).toList();
+      _watchlist.map(requireTicker).toList();
+
+  void addToWatchlist(String symbol) {
+    if (!_watchlist.contains(symbol)) {
+      _watchlist.add(symbol);
+    }
+  }
+
+  void removeFromWatchlist(String symbol) {
+    _watchlist.remove(symbol);
+  }
 
   StockTicker requireTicker(String symbol) {
     final ticker = _tickers[symbol.toUpperCase()];

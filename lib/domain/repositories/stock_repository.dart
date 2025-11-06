@@ -10,4 +10,6 @@ abstract class StockRepository {
     String symbol,
     StockInterval interval,
   );
+  Future<void> addToWatchlist(String symbol);
+  Future<void> removeFromWatchlist(String symbol);
 }
