@@ -65,16 +65,8 @@ class WatchlistViewModel extends ChangeNotifier {
     }
 
     try {
-      final ticker = await _repository.fetchTicker(normalized);
-      final updated = List<StockTicker>.from(_state.watchlist)..add(ticker);
-
-      _watchlistSymbols.add(normalized);
-      _setState(
-        _state.copyWith(
-          watchlist: List<StockTicker>.unmodifiable(updated),
-          clearError: true,
-        ),
-      );
+      await _repository.addToWatchlist(normalized);
+      await load();
     } catch (error) {
       _setState(
         _state.copyWith(
@@ -85,23 +77,23 @@ class WatchlistViewModel extends ChangeNotifier {
     }
   }
 
-  void removeFromWatchlist(String symbol) {
+  Future<void> removeFromWatchlist(String symbol) async {
     final normalized = symbol.toUpperCase();
     if (!_watchlistSymbols.contains(normalized)) {
       return;
     }
 
-    final updated = _state.watchlist
-        .where((ticker) => ticker.symbol.toUpperCase() != normalized)
-        .toList(growable: false);
-
-    _watchlistSymbols.remove(normalized);
-    _setState(
-      _state.copyWith(
-        watchlist: List<StockTicker>.unmodifiable(updated),
-        clearError: true,
-      ),
-    );
+    try {
+      await _repository.removeFromWatchlist(normalized);
+      await load();
+    } catch (error) {
+      _setState(
+        _state.copyWith(
+          status: WatchlistStatus.error,
+          errorMessage: error.toString(),
+        ),
+      );
+    }
   }
 
   Future<void> search(String query) async {
