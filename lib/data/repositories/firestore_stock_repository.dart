@@ -1,19 +1,22 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 
 import '../../domain/models/price_point.dart';
 import '../../domain/models/stock_interval.dart';
 import '../../domain/models/stock_ticker.dart';
 import '../../domain/repositories/stock_repository.dart';
-import 'fake_stock_repository.dart';
+import '../datasources/alpha_vantage_data_source.dart';
 
 class FirestoreStockRepository implements StockRepository {
   FirestoreStockRepository({
     required this.firestore,
-  }) : _fakeRepository = FakeStockRepository();
+    required this.alphaVantageDataSource,
+  });
 
   final FirebaseFirestore firestore;
-  final StockRepository _fakeRepository;
+  final AlphaVantageDataSource alphaVantageDataSource;
+  final Map<String, StockTicker> _tickerCache = {};
 
   static const String _watchlistCollection = 'watchlist';
 
@@ -51,17 +54,42 @@ class FirestoreStockRepository implements StockRepository {
   }
 
   @override
-  Future<StockTicker> fetchTicker(String symbol) {
-    return _fakeRepository.fetchTicker(symbol);
+  Future<StockTicker> fetchTicker(String symbol) async {
+    final upperSymbol = symbol.toUpperCase();
+
+    // 캐시 확인
+    if (_tickerCache.containsKey(upperSymbol)) {
+      return _tickerCache[upperSymbol]!;
+    }
+
+    try {
+      final ticker = await alphaVantageDataSource.fetchTicker(upperSymbol);
+      _tickerCache[upperSymbol] = ticker;
+      return ticker;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
-  Future<List<PricePoint>> fetchTimeSeries(String symbol, StockInterval interval) {
-    return _fakeRepository.fetchTimeSeries(symbol, interval);
+  Future<List<PricePoint>> fetchTimeSeries(String symbol, StockInterval interval) async {
+    try {
+      return await alphaVantageDataSource.fetchTimeSeries(symbol, interval);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
-  Future<List<StockTicker>> searchTickers(String query) {
-    return _fakeRepository.searchTickers(query);
+  Future<List<StockTicker>> searchTickers(String query) async {
+    try {
+      return await alphaVantageDataSource.searchTickers(query);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  void clearCache() {
+    _tickerCache.clear();
   }
 }
