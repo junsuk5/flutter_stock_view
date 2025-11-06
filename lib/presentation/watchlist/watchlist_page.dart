@@ -69,7 +69,7 @@ class WatchlistPage extends StatelessWidget {
         if (state.status == WatchlistStatus.error)
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: _buildInlineError(context, state.errorMessage!),
+            child: _buildInlineError(context, state.errorMessage ?? '알 수 없는 오류가 발생했습니다.'),
           ),
         if (state.watchlist.isEmpty)
           _buildEmptyState(context)
