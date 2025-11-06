@@ -46,24 +46,25 @@ class _StockHomeState extends State<StockHome> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),
-            label: 'Watchlist',
+            label: '관심종목',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.lightbulb_outline),
-            label: 'Insights',
+            label: '인사이트',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.pie_chart_outline),
-            label: 'Portfolio',
+            label: '포트폴리오',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
-            label: 'Settings',
+            label: '설정',
           ),
         ],
       ),
@@ -80,7 +81,7 @@ class _PlaceholderTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        '$label 화면은 준비 중입니다.',
+        '$label 페이지',
         style: Theme.of(context).textTheme.titleMedium,
       ),
     );
